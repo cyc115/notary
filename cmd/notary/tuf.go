@@ -112,10 +112,11 @@ type tufCommander struct {
 	retriever    notary.PassRetriever
 
 	// these are for command line parsing - no need to set
-	roles   []string
-	sha256  string
-	sha512  string
-	rootKey string
+	roles    []string
+	sha256   string
+	sha512   string
+	rootKey  string
+	rootCert string
 
 	input  string
 	output string
@@ -133,6 +134,7 @@ type tufCommander struct {
 func (t *tufCommander) AddToCommand(cmd *cobra.Command) {
 	cmdTUFInit := cmdTUFInitTemplate.ToCommand(t.tufInit)
 	cmdTUFInit.Flags().StringVar(&t.rootKey, "rootkey", "", "Root key to initialize the repository with")
+	cmdTUFInit.Flags().StringVar(&t.rootCert, "rootcert", "", "Root key certificate to initialize the repository with")
 	cmdTUFInit.Flags().BoolVarP(&t.autoPublish, "publish", "p", false, htAutoPublish)
 	cmd.AddCommand(cmdTUFInit)
 
