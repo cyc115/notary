@@ -204,13 +204,28 @@ func TestInitWithRootCert(t *testing.T) {
 	err = ioutil.WriteFile(encryptedPEMKeyFilename, encrpytedPEMPrivKey, 0644)
 	require.NoError(t, err)
 
-	//build path to root cert
-	unencryptedCertFilename := filepath.Join("~/test", "test_cert.pem")
+	//filepathes of certificates used in this test
+	//TODO move the file to notary/fixture
+	nonMatchingCertFilename := filepath.Join("~/test", "non_matching_cert.pem")
+	nonExistingCertFilename := filepath.Join("~/test/non_existing_cert.pem")
+	matchingCertFilename := filepath.Join("~/test/matching_cert.pem")
+
+	//test init repo without --rootkey but with --rootcert
+	res, err := runCommand(t, tempDir, "-s", server.URL, "init", "motorolasolutions.com/hello", "--rootcert", nonMatchingCertFilename)
+	require.Error(t, err)
+
+	//test init repo with nonexisting path to rootcert
+	res, err = runCommand(t, tempDir, "-s", server.URL, "init", "motorolasolutions.com/hello", "--rootkey", encryptedPEMKeyFilename, "--rootcert", nonExistingCertFilename)
+	require.Error(t, err)
+
+	//init repo with non-matching rootcert
+	res, err = runCommand(t, tempDir, "-s", server.URL, "init", "motorolasolutions.com/hello", "--rootkey", encryptedPEMKeyFilename, "--rootcert", nonMatchingCertFilename)
+	require.Error(t, err)
+
+	//init repo with matching rootcert
+	res, err = runCommand(t, tempDir, "-s", server.URL, "init", "motorolasolutions.com/hello", "--rootkey", encryptedPEMKeyFilename, "--rootcert", matchingCertFilename)
 	require.NoError(t, err)
 
-	//init repo with any cert : this should fail later to confirm cert corresponds to rootkey
-	res, err := runCommand(t, tempDir, "-s", server.URL, "init", "motorolasolutions.com/hello", "--rootkey", encryptedPEMKeyFilename, "--rootcert", unencryptedCertFilename)
-	require.NoError(t, err)
 	err = ioutil.WriteFile(filepath.Join(tempDir, "log.txt"), []byte(res), 0644)
 	require.NoError(t, err)
 }
