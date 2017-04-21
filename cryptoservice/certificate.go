@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"time"
 
+	"strings"
+
 	"github.com/docker/notary/tuf/data"
 	"github.com/docker/notary/tuf/utils"
 )
@@ -22,19 +24,23 @@ func GenerateCertificate(rootKey data.PrivateKey, gun data.GUN, startTime, endTi
 }
 
 func generateCertificate(signer crypto.Signer, gun data.GUN, startTime, endTime time.Time) (*x509.Certificate, error) {
-	template, err := utils.NewCertificate(gun.String(), startTime, endTime)
+
+	//remove the last segment of repo name separated by `/` and append a wildcard *
+	wildCardedGUN := gun.String()[0:strings.LastIndex(gun.String(), `/`)+1] + "*"
+
+	template, err := utils.NewCertificate(wildCardedGUN, startTime, endTime)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create the certificate template for: %s (%v)", gun, err)
+		return nil, fmt.Errorf("failed to create the certificate template for: %s (%v)", wildCardedGUN, err)
 	}
 
 	derBytes, err := x509.CreateCertificate(rand.Reader, template, template, signer.Public(), signer)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create the certificate for: %s (%v)", gun, err)
+		return nil, fmt.Errorf("failed to create the certificate for: %s (%v)", wildCardedGUN, err)
 	}
 
 	cert, err := x509.ParseCertificate(derBytes)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse the certificate for key: %s (%v)", gun, err)
+		return nil, fmt.Errorf("failed to parse the certificate for key: %s (%v)", wildCardedGUN, err)
 	}
 
 	return cert, nil
