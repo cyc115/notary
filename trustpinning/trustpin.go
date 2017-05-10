@@ -50,7 +50,7 @@ func NewTrustPinChecker(trustPinConfig TrustPinConfig, gun data.GUN, firstBootst
 		// and use it to validate certs in the root.json later
 		caCerts, err := utils.LoadCertBundleFromFile(caFilepath)
 		if err != nil {
-			return nil, fmt.Errorf("could not load root cert from CA path")
+			return nil, fmt.Errorf("could not load root cert from CA path: %v", err)
 		}
 		// Now only consider certificates that are direct children from this CA cert chain
 		caRootPool := x509.NewCertPool()
@@ -65,6 +65,7 @@ func NewTrustPinChecker(trustPinConfig TrustPinConfig, gun data.GUN, firstBootst
 		if len(caRootPool.Subjects()) == 0 {
 			return nil, fmt.Errorf("invalid CA certs provided")
 		}
+		fmt.Println(string(caRootPool.Subjects()[0]))
 		t.pinnedCAPool = caRootPool
 		return t.caCheck, nil
 	}
@@ -97,7 +98,9 @@ func (t trustPinChecker) caCheck(leafCert *x509.Certificate, intCerts []*x509.Ce
 	// Attempt to find a valid certificate chain from the leaf cert to CA root
 	// Use this certificate if such a valid chain exists (possibly using intermediates)
 	var err error
-	if _, err = leafCert.Verify(x509.VerifyOptions{Roots: t.pinnedCAPool, Intermediates: caIntPool}); err == nil {
+	if _, err = leafCert.Verify(x509.VerifyOptions{Roots: t.pinnedCAPool,
+		Intermediates: caIntPool,
+		KeyUsages:     []x509.ExtKeyUsage{x509.ExtKeyUsageCodeSigning}}); err == nil {
 		return true
 	}
 	logrus.Debugf("unable to find a valid certificate chain from leaf cert to CA root: %s", err)
