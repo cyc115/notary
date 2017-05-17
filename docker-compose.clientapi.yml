@@ -27,7 +27,7 @@ services:
       - "8080"
       - "4443:4443"
     entrypoint: /usr/bin/env sh
-    command: -c "./migrations/migrate.sh && notary-server -config=./fixtures/server-config.json"
+    command: -c "notary-server -config=./fixtures/server-config.json"
     depends_on:
       - mysql
       - signer
@@ -43,7 +43,7 @@ services:
     ports:
       - "7899:7899"
     entrypoint: /usr/bin/env sh
-    command: -c "./migrations/migrate.sh && notary-signer -config=./fixtures/signer-config.json"
+    command: -c "notary-signer -config=./fixtures/signer-config.json"
     depends_on:
       - mysql
   escrow:
