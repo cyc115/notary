@@ -12,7 +12,7 @@ services:
       api:
       esc:
     entrypoint: clientapi
-    command: -config=./fixtures/clientapi-server-config.toml
+    command: -config=./fixtures/clientapi-server-prod-config.toml
   server:
     build:
           context: .

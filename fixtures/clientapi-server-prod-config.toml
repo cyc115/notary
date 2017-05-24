@@ -7,7 +7,8 @@ tls_key_file = "./clientapi-server.key"
 level = "debug"
 
 [upstream]
-addr = "https://notary.docker.io"
+addr = "https://notaryserver:4443"
+tls_ca_file = "./root-ca.crt"
 
 [key_storage]
 type = "remote"
