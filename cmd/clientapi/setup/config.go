@@ -4,6 +4,9 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"net"
+	"path/filepath"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/docker/go-connections/tlsconfig"
 	"github.com/docker/notary"
@@ -18,8 +21,6 @@ import (
 	"google.golang.org/grpc"
 	ghealth "google.golang.org/grpc/health"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
-	"net"
-	"path/filepath"
 )
 
 // the client api will always require push and pull permissions against
@@ -68,6 +69,7 @@ func GetAddrAndTLSConfig(vc *viper.Viper) (string, *tls.Config, error) {
 	return grpcAddr, tlsConfig, nil
 }
 
+// Note: used by API client probably for token authorization between API client and CLI client
 func Authorization(vc *viper.Viper) (grpc.UnaryServerInterceptor, error) {
 	authType := vc.GetString("auth.type")
 	switch authType {
@@ -79,11 +81,12 @@ func Authorization(vc *viper.Viper) (grpc.UnaryServerInterceptor, error) {
 			rootCAPath  = utils.GetPathRelativeToConfig(vc, "auth.options.rootcertbundle")
 			permissions = vc.GetStringMap("auth.options.permissions")
 		)
-		logrus.Debugf("token realm: %s", realm)
-		logrus.Debugf("token service: %s", service)
-		logrus.Debugf("token issuer: %s", issuer)
-		logrus.Debugf("token ca path: %s", rootCAPath)
+		logrus.Debugf("--->> token realm: %s", realm)
+		logrus.Debugf("--->> token service: %s", service)
+		logrus.Debugf("--->> token issuer: %s", issuer)
+		logrus.Debugf("--->> token ca path: %s", rootCAPath)
 		tokenAuth, err := token.NewAuth(realm, issuer, service, rootCAPath)
+
 		if err != nil {
 			return nil, err
 		}
@@ -132,6 +135,7 @@ func KeyStorage(vc *viper.Viper) ([]trustmanager.KeyStore, error) {
 		if err != nil {
 			return nil, err
 		}
+		// set up remote key store
 		store, err := remoteks.NewRemoteStore(
 			vc.GetString("key_storage.addr"),
 			tlsConfig,
@@ -140,6 +144,7 @@ func KeyStorage(vc *viper.Viper) ([]trustmanager.KeyStore, error) {
 		if err != nil {
 			return nil, err
 		}
+		// Note: API client : a const passphrase retriever is used for the key escrow
 		keyStore = trustmanager.NewGenericKeyStore(store, passphrase.ConstantRetriever(secret))
 	default:
 		return nil, errors.New("no key storage configured")

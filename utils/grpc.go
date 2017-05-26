@@ -3,6 +3,8 @@ package utils
 import (
 	"crypto/tls"
 	"fmt"
+	"strings"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/docker/go-connections/tlsconfig"
 	auth "github.com/docker/notary/auth/client"
@@ -10,7 +12,6 @@ import (
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
-	"strings"
 )
 
 // sets up TLS for the GRPC connection to notary-signer
@@ -46,6 +47,7 @@ func grpcTLS(configuration *viper.Viper, prefix string) (*tls.Config, error) {
 }
 
 func GetGRPCClient(vc *viper.Viper, prefix string, credStore auth.CredentialStore) (*grpc.ClientConn, error) {
+	logrus.Debug("--->> GetGRPCClient()")
 	var (
 		dialOpts = []grpc.DialOption{
 			grpc.WithBlock(),
@@ -59,6 +61,7 @@ func GetGRPCClient(vc *viper.Viper, prefix string, credStore auth.CredentialStor
 			".",
 		),
 	)
+	logrus.Debug("--->> addr: ", addr)
 
 	if vc.GetBool(
 		strings.Join(
@@ -69,11 +72,13 @@ func GetGRPCClient(vc *viper.Viper, prefix string, credStore auth.CredentialStor
 		logrus.Warn("setting insecure connection")
 		dialOpts = append(dialOpts, grpc.WithInsecure())
 	} else {
+		logrus.Debug("--->> prefix : ", prefix)
 		tlsConfig, err = grpcTLS(vc, prefix)
 		if err != nil {
 			logrus.Warn(err)
 			dialOpts = append(dialOpts, grpc.WithInsecure())
 		} else {
+			logrus.Debug("--->> dialOpts len: ", len(dialOpts))
 			creds := credentials.NewTLS(tlsConfig)
 			dialOpts = append(dialOpts, grpc.WithTransportCredentials(creds))
 		}

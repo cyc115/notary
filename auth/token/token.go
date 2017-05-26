@@ -13,6 +13,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/docker/libtrust"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/docker/distribution/registry/auth"
 )
 
@@ -83,6 +84,28 @@ type VerifyOptions struct {
 // NewToken parses the given raw token string
 // and constructs an unverified JSON Web Token.
 func NewToken(rawToken string) (*Token, error) {
+	logrus.Debug("--->> NewToken")
+	logrus.Debug("------>> raw token: ", rawToken)
+
+	//Note: rawToken looks to be from https://auth.docker.io/token which is passed in via clientapi-server-prod-config.toml
+	// from the header we can see: alg = es256, typ = jwt, x5c = a cert. //Question: according to RFC 7515: x5c is the pub key corresponding to
+	// the key used to digitally sign the jws. But this seems odd because the attacker would then be able to change the header and the signature.
+	// specifying its own key and replacing the original signature by a counterfait
+
+	/* payload as following:
+	{
+	  "access": [],
+	  "aud": "notary.docker.io",
+	  "exp": 1495643299,
+	  "iat": 1495642999,
+	  "iss": "auth.docker.io",
+	  "jti": "Uxn80seud7k_OdB4gDPj",
+	  "nbf": 1495642699,
+	  "sub": "cf2aa3dc-cb98-46a0-b8c5-534183a78226"
+	}
+	*/
+	// and then there's the sig
+
 	parts := strings.Split(rawToken, TokenSeparator)
 	if len(parts) != 3 {
 		return nil, ErrMalformedToken
@@ -133,7 +156,16 @@ func NewToken(rawToken string) (*Token, error) {
 
 // Verify attempts to verify this token using the given options.
 // Returns a nil error if the token is valid.
+// verifyOpts is what the token need to contain in order for the
+// token auth to work
 func (t *Token) Verify(verifyOpts VerifyOptions) error {
+	// Note: this should happen on API client
+	logrus.Debug("--->> Verify() token: ")
+	logrus.Debug("------>> trusted iss: %v : %v", verifyOpts.TrustedIssuers, t.Claims.Issuer)
+	logrus.Debug("------>> aud : %v: %v", verifyOpts.AcceptedAudiences, t.Claims.Audience)
+	logrus.Debug("------>> aud : %v: %v", verifyOpts.AcceptedAudiences, t.Claims.Audience)
+	logrus.Debug("------>> obtained tok exp: %v", t.Claims.Expiration)
+	logrus.Debug("------>> Verify() token: ")
 	// Verify that the Issuer claim is a trusted authority.
 	if !contains(verifyOpts.TrustedIssuers, t.Claims.Issuer) {
 		log.Infof("token from untrusted issuer: %q", t.Claims.Issuer)
@@ -168,6 +200,7 @@ func (t *Token) Verify(verifyOpts VerifyOptions) error {
 	}
 
 	// Verify that the signing key is trusted.
+	// Note: works with x5c , kid and jwk
 	signingKey, err := t.VerifySigningKey(verifyOpts)
 	if err != nil {
 		log.Info(err)

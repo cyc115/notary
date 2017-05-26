@@ -235,6 +235,10 @@ func (th *tokenHandler) Scheme() string {
 }
 
 func (th *tokenHandler) AuthorizeRequest(req *http.Request, params map[string]string) error {
+
+	// logrus.Debug("--->> AuthorizeRequest: reqURL: %v", req.RequestURI)
+	// PrettyPrintMap("params", params)
+
 	var additionalScopes []string
 	if fromParam := req.URL.Query().Get("from"); fromParam != "" {
 		additionalScopes = append(additionalScopes, RepositoryScope{
@@ -247,13 +251,15 @@ func (th *tokenHandler) AuthorizeRequest(req *http.Request, params map[string]st
 	if err != nil {
 		return err
 	}
-
+	//Note: I guess this happens on API server, authorizing to CLI
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
-
 	return nil
 }
 
 func (th *tokenHandler) getToken(params map[string]string, additionalScopes ...string) (string, error) {
+	// logrus.Debug("--->> getToken()")
+	// PrettyPrintList("additionalScopes", additionalScopes)
+
 	th.tokenLock.Lock()
 	defer th.tokenLock.Unlock()
 	scopes := make([]string, 0, len(th.scopes)+len(additionalScopes))
@@ -449,6 +455,7 @@ func (th *tokenHandler) fetchTokenWithBasicAuth(realm *url.URL, service string, 
 }
 
 func (th *tokenHandler) fetchToken(params map[string]string, scopes []string) (token string, expiration time.Time, err error) {
+	logrus.Debug("--->> fetchToken()")
 	realm, ok := params["realm"]
 	if !ok {
 		return "", time.Time{}, errors.New("no realm specified for token auth challenge")

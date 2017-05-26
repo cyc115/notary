@@ -140,7 +140,7 @@ func (th *TokenHandler) Scheme() string {
 func (th *TokenHandler) AuthorizeRequest(params map[string]string, scopes ...string) (string, error) {
 	//th.tokenLock.Lock()
 	//defer th.tokenLock.Unlock()
-
+	logrus.Debug("--->> AuthorizeRequest()")
 	rawToken, _, err := th.fetchToken(params, scopes)
 	return rawToken, err
 }
@@ -153,7 +153,9 @@ type postTokenResponse struct {
 	Scope        string    `json:"scope"`
 }
 
+// Note: probably happens on the cli side
 func (th *TokenHandler) fetchTokenWithOAuth(realm *url.URL, refreshToken, service string, scopes []string) (token string, expiration time.Time, err error) {
+	logrus.Debug("--->> fetchTokenWithOAuth()")
 	form := url.Values{}
 	form.Set("scope", strings.Join(scopes, " "))
 	form.Set("service", service)
@@ -164,6 +166,10 @@ func (th *TokenHandler) fetchTokenWithOAuth(realm *url.URL, refreshToken, servic
 		return "", time.Time{}, errors.New("no client ID configured")
 	}
 	form.Set("client_id", clientID)
+	logrus.Debug("--->> client id: ", clientID)
+	logrus.Debug("--->> refresh token: ", refreshToken)
+	logrus.Debug("--->> service: ", service)
+	logrus.Debug("--->> Scope: ", scopes)
 
 	if refreshToken != "" {
 		form.Set("grant_type", "refresh_token")
@@ -226,7 +232,10 @@ type getTokenResponse struct {
 }
 
 func (th *TokenHandler) fetchTokenWithBasicAuth(realm *url.URL, service string, scopes []string) (token string, expiration time.Time, err error) {
-
+	logrus.Debug("--->> fetchTokenWithBasicAuth()")
+	logrus.Debug("------>> realm: ", realm)
+	logrus.Debug("------>> service: ", service)
+	logrus.Debug("------>> scopes: ", scopes)
 	req, err := http.NewRequest("GET", realm.String(), nil)
 	if err != nil {
 		return "", time.Time{}, err
@@ -310,6 +319,7 @@ func (th *TokenHandler) fetchTokenWithBasicAuth(realm *url.URL, service string, 
 }
 
 func (th *TokenHandler) fetchToken(params map[string]string, scopes []string) (token string, expiration time.Time, err error) {
+	logrus.Debug("--->> fetchToken()")
 	realm, ok := params["realm"]
 	if !ok {
 		return "", time.Time{}, errors.New("no realm specified for token auth challenge")
@@ -325,13 +335,18 @@ func (th *TokenHandler) fetchToken(params map[string]string, scopes []string) (t
 
 	var refreshToken string
 
+	logrus.Debug("------>> th.creds: ", th.creds)
+
 	if th.creds != nil {
+		logrus.Debug("------>> th.creds.RefreshToken: ", th.creds.RefreshToken(realmURL, service))
 		refreshToken = th.creds.RefreshToken(realmURL, service)
+
 	}
 
 	if refreshToken != "" || th.forceOAuth {
 		return th.fetchTokenWithOAuth(realmURL, refreshToken, service, scopes)
 	}
 
+	//Basic is used for now ?
 	return th.fetchTokenWithBasicAuth(realmURL, service, scopes)
 }

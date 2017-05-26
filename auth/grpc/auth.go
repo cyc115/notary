@@ -3,6 +3,10 @@ package grpcauth
 import (
 	"errors"
 	"fmt"
+	"net/http"
+	"net/url"
+	"strings"
+
 	"github.com/Sirupsen/logrus"
 	auth "github.com/docker/notary/auth/client"
 	"github.com/docker/notary/auth/token"
@@ -11,9 +15,6 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
-	"net/http"
-	"net/url"
-	"strings"
 )
 
 type guner interface {
@@ -39,6 +40,7 @@ func NewServerAuthorizer(authVerifier *token.Auth, permissions map[string][]stri
 // Interceptor checks the provided tokens and either returns an error that includes the required
 // token scope and actions, or allows the request to proceed
 // TODO: are the error responses the ones we want to use
+// Note: on API client
 func (s ServerAuthorizer) Interceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
 	if s.authVerifier != nil {
 		gnr, ok := req.(guner)
@@ -56,6 +58,8 @@ func (s ServerAuthorizer) Interceptor(ctx context.Context, req interface{}, info
 				rawToken = ts[0]
 			}
 		}
+		logrus.Debug("--->> Interceptor() ")
+		logrus.Debug("--->> rawToken: on Client API?: ", rawToken)
 		rawToken = strings.TrimPrefix(rawToken, "Bearer ")
 		if _, err := s.authVerifier.Authorize(rawToken); !ok || err != nil {
 			md := s.authVerifier.ChallengeHeaders(
@@ -85,11 +89,12 @@ func NewClientAuthorizer(credStr auth.CredentialStore) grpc.UnaryClientIntercept
 	c := ClientAuthorizer{
 		authHandler: auth.NewTokenHandler(
 			http.DefaultTransport,
-			credStr,
+			credStr, // Note: does not have refresh token
 			"registry-client",
 			"",
 		),
 	}
+
 	return c.Interceptor
 }
 
@@ -134,7 +139,11 @@ func (c *ClientAuthorizer) Interceptor(ctx context.Context, method string, req, 
 	return invoker(ctx, method, req, reply, cc, opts...)
 }
 
+// Note: cli client
 func (c *ClientAuthorizer) getToken(challengeHeader []string) (string, error) {
+	logrus.Debug("--->> getToken()")
+	logrus.Debug("------>> challengeHeader", challengeHeader)
+
 	challenges := auth.ParseAuthHeader(challengeHeader)
 	if len(challenges) == 0 {
 		return "", errors.New("no challenge header could be parsed from the response")
@@ -150,6 +159,11 @@ func NewCredStore(store auth.CredentialStore, refreshTokens, accessTokens map[st
 	if accessTokens == nil {
 		accessTokens = make(map[string]string)
 	}
+
+	logrus.Debug("--->> NewCredStore()")
+	logrus.Debug("------>> refreshToken: ", refreshTokens)
+	logrus.Debug("------>> AccessToken: ", accessTokens)
+
 	return &credStore{
 		store:         store,
 		refreshTokens: refreshTokens,
@@ -162,7 +176,9 @@ type credStore struct {
 	refreshTokens, accessTokens map[string]string
 }
 
+//Note: local on CLI
 func (cs credStore) Basic(u *url.URL) (string, string) {
+	logrus.Debug("--->> Basic() in auth")
 	return cs.store.Basic(u)
 }
 

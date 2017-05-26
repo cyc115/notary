@@ -25,5 +25,5 @@ type = "token"
     realm = "https://auth.docker.io/token"
     service = "notary.docker.io"
     issuer = "auth.docker.io"
-    rootcertbundle = "./tokencertbundle.pem"
+    rootcertbundle = "./clientapi-server.crt"
 

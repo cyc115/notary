@@ -880,6 +880,8 @@ func (ps passwordStore) Basic(u *url.URL) (string, string) {
 		return "", ""
 	}
 
+	logrus.Debug("--->> basic auth, url: ", u, " is term: ", terminal.IsTerminal(int(os.Stdin.Fd())))
+
 	stdin := bufio.NewReader(os.Stdin)
 	fmt.Fprintf(os.Stdout, "Enter username: ")
 
@@ -928,6 +930,7 @@ const (
 // permissions on the server, readOnly must be false
 func getTransport(config *viper.Viper, gun data.GUN, permission httpAccess) (http.RoundTripper, error) {
 	// Attempt to get a root CA from the config file. Nil is the host defaults.
+	// Note: notary cli config : .notary/config.json
 	rootCAFile := utils.GetPathRelativeToConfig(config, "remote_server.root_ca")
 	clientCert := utils.GetPathRelativeToConfig(config, "remote_server.tls_client_cert")
 	clientKey := utils.GetPathRelativeToConfig(config, "remote_server.tls_client_key")
@@ -971,7 +974,7 @@ func tokenAuth(trustServerURL string, baseTransport *http.Transport, gun data.GU
 
 	// TODO(dmcgowan): add notary specific headers
 	authTransport := transport.NewTransport(baseTransport)
-	pingClient := &http.Client{
+	pingClient := &http.Client{ // already SSL handshaked
 		Transport: authTransport,
 		Timeout:   5 * time.Second,
 	}
@@ -998,6 +1001,7 @@ func tokenAuth(trustServerURL string, baseTransport *http.Transport, gun data.GU
 		return nil, nil
 	}
 	// non-nil err means we must close body
+	//Note: API client health check
 	defer resp.Body.Close()
 	if (resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices) &&
 		resp.StatusCode != http.StatusUnauthorized {
@@ -1031,6 +1035,7 @@ func tokenAuth(trustServerURL string, baseTransport *http.Transport, gun data.GU
 	tokenHandler := auth.NewTokenHandler(authTransport, ps, gun.String(), actions...)
 	basicHandler := auth.NewBasicHandler(ps)
 
+	//Note: try to auth first via token, if not use basic
 	modifier := auth.NewAuthorizer(challengeManager, tokenHandler, basicHandler)
 
 	if permission != readOnly {

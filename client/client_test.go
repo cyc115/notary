@@ -652,6 +652,18 @@ func TestAddTargetToTargetRoleByDefault(t *testing.T) {
 	testAddTargetToTargetRoleByDefault(t, false)
 	testAddTargetToTargetRoleByDefault(t, true)
 }
+func TestCyc(t *testing.T) {
+	ts, _, _ := simpleTestServer(t)
+	defer ts.Close()
+	repo, _ := initializeRepo(t, data.ECDSAKey, "docker.com/notary", ts.URL, false)
+	defer os.RemoveAll(repo.baseDir)
+
+	target := addTarget(t, repo, "latest", "../fixtures/intermediate-ca.crt", data.CanonicalTargetsRole)
+	t.Log("len: ", target.Length)
+	t.Log("hashes: ", target.Hashes)
+	t.Log("name: ", target.Name)
+	t.Fail()
+}
 
 func testAddTargetToTargetRoleByDefault(t *testing.T, clearCache bool) {
 	ts, _, _ := simpleTestServer(t)
@@ -2041,13 +2053,26 @@ func TestPublishDelegationsX509(t *testing.T) {
 	testPublishDelegations(t, false, true)
 }
 
+func TestCreateKey(t *testing.T) {
+	ts := fullTestServer(t)
+	defer ts.Close()
+
+	repo1, _ := initializeRepo(t, data.ECDSAKey, "docker.com/notary", ts.URL, false)
+	defer os.RemoveAll(repo1.baseDir)
+	delgKey := createKey(t, repo1, "targets/a", false)
+	fmt.Println(delgKey.Algorithm(), delgKey.ID(), delgKey.Public())
+
+	delg := createKey(t, repo1, "targets/a", true)
+	fmt.Println(delg.Algorithm(), delg.ID(), string(delg.Public()))
+
+}
+
 func testPublishDelegations(t *testing.T, clearCache, x509Keys bool) {
 	ts := fullTestServer(t)
 	defer ts.Close()
 
 	repo1, _ := initializeRepo(t, data.ECDSAKey, "docker.com/notary", ts.URL, false)
 	defer os.RemoveAll(repo1.baseDir)
-
 	delgKey := createKey(t, repo1, "targets/a", x509Keys)
 
 	// This should publish fine, even though targets/a/b is dependent upon

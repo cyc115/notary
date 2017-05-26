@@ -6,6 +6,7 @@ import (
 	"google.golang.org/grpc"
 
 	"errors"
+
 	"github.com/docker/notary/client"
 	"github.com/docker/notary/client/changelist"
 	"github.com/docker/notary/cryptoservice"
@@ -39,6 +40,9 @@ type Server struct {
 }
 
 func (srv *Server) Initialize(ctx context.Context, initMessage *InitMessage) (*BasicResponse, error) {
+	logrus.Debug("--->> api client received the following : ")
+	logrus.Debug("--->> role: ", initMessage.GetServerManagedRoles().GetRoles())
+	logrus.Debug("--->> gun: ", initMessage.GetGun(), "keyids: ", initMessage.RootKeyIDs)
 	r, err := srv.initRepo(ctx, data.GUN(initMessage.Gun))
 	if err != nil {
 		return nil, err
@@ -654,9 +658,11 @@ func initializeRepo(r *client.NotaryRepository) error {
 	return r.Initialize([]string{rootKeyID})
 }
 
+// this is called on notary API client to initializing repo
 func (srv *Server) initRepo(ctx context.Context, gun data.GUN) (*client.NotaryRepository, error) {
-	logrus.Errorf("initializing with upstream ca file %s", srv.upstreamCAPath)
+	logrus.Errorf("initializing with upstream ca file %s", srv.upstreamCAPath) //Note: the upstreamCA is possibly used to tls with notary server
 	md, ok := metadata.FromContext(ctx)
+	logrus.Debug("--->> MD", md)
 	if !ok {
 		return nil, errors.New("initRepo may only be used with GRPC contexts")
 	}
