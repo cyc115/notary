@@ -40,6 +40,7 @@ type Server struct {
 }
 
 func (srv *Server) Initialize(ctx context.Context, initMessage *InitMessage) (*BasicResponse, error) {
+	logrus.Debug("~~~initialize~~~")
 	logrus.Debug("--->> api client received the following : ")
 	logrus.Debug("--->> role: ", initMessage.GetServerManagedRoles().GetRoles())
 	logrus.Debug("--->> gun: ", initMessage.GetGun(), "keyids: ", initMessage.RootKeyIDs)
@@ -64,6 +65,7 @@ func (srv *Server) Initialize(ctx context.Context, initMessage *InitMessage) (*B
 }
 
 func (srv *Server) Publish(ctx context.Context, gun *GunMessage) (*BasicResponse, error) {
+	logrus.Debug("~~~publish~~~")
 	r, err := srv.initRepo(ctx, data.GUN(gun.Gun))
 	if err != nil {
 		return nil, err
@@ -80,6 +82,7 @@ func (srv *Server) Publish(ctx context.Context, gun *GunMessage) (*BasicResponse
 }
 
 func (srv *Server) AddTarget(ctx context.Context, t *Target) (*BasicResponse, error) {
+	logrus.Debug("~~~addTarget~~~")
 	r, err := srv.initRepo(ctx, data.GUN(t.GetGun()))
 	if err != nil {
 		return nil, err
@@ -103,6 +106,7 @@ func (srv *Server) AddTarget(ctx context.Context, t *Target) (*BasicResponse, er
 }
 
 func (srv *Server) RemoveTarget(ctx context.Context, t *Target) (*BasicResponse, error) {
+
 	r, err := srv.initRepo(ctx, data.GUN(t.GetGun()))
 	if err != nil {
 		return nil, err
@@ -321,6 +325,7 @@ func (srv *Server) GetDelegationRoles(ctx context.Context, message *GunMessage) 
 }
 
 func (srv *Server) AddDelegation(ctx context.Context, message *AddDelegationMessage) (*BasicResponse, error) {
+	logrus.Debug("~~~addDelegation~~~")
 	r, err := srv.initRepo(ctx, data.GUN(message.Gun))
 	if err != nil {
 		return nil, err
