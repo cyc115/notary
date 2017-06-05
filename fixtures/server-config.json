@@ -21,19 +21,15 @@
 		"db_url": "server@tcp(mysql:3306)/notaryserver?parseTime=True"
 	},
 	"repositories" : {
-		"gun_prefixes": [
-			"motorolasolutions.com/", 
-			"test/"
-			]
-	}, 
+		"gun_prefixes": ["motorolasolutions.com/", "test/"]
+	},
 	"auth" : {
 		"type" : "token",
 		"options" : {
 			"realm" : "https://auth.docker.io/token", 
 			"service" : "notary.docker.io", 
 			"issuer" : "auth.docker.io",
-			"rootcetbundle" : "./dockerauth.crt"
+			"rootcertbundle" : "./root-ca.crt"
 		}
 	}
-
 }
