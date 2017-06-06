@@ -1,0 +1,22 @@
+version: "2"
+services:
+  clientapi:
+    build:
+      context: .
+      dockerfile: clientapi.Dockerfile
+    ports:
+      - "4449:4449"
+    networks:
+      api:
+      esc:
+    entrypoint: clientapi
+    command: -config=./fixtures/clientapi-server-prod-config.toml
+networks:
+  mdb:
+    external: false
+  sig:
+    external: false
+  api:
+    external: false
+  esc:
+    external: false

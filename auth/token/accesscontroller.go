@@ -11,6 +11,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/docker/distribution/registry/auth"
 	"github.com/docker/libtrust"
 )
@@ -130,6 +131,8 @@ func NewAuth(realm, issuer, service, rootCertBundle string) (*Auth, error) {
 
 	fp, err := os.Open(rootCertBundle)
 	if err != nil {
+		logrus.Debug("certbundle path: " + rootCertBundle)
+
 		return nil, fmt.Errorf("unable to open token auth root certificate bundle file %q: %s", rootCertBundle, err)
 	}
 	defer fp.Close()

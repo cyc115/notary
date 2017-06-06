@@ -1,0 +1,36 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 0 (0x0)
+    Signature Algorithm: ecdsa-with-SHA256
+        Issuer: CN=Q4Z3:GW7I:XTPD:HM4Q:OTTX:6AEC:RM3C:AR2C:OF77:BVEA:IFEI:CY5K
+        Validity
+            Not Before: May  2 22:04:57 2017 GMT
+            Not After : May  2 22:04:57 2018 GMT
+        Subject: CN=MN6N:FHTW:IXEG:OI7Q:A5WF:YDE4:7C7N:GWIQ:5W27:HN5J:UNCA:2HMB
+        Subject Public Key Info:
+            Public Key Algorithm: id-ecPublicKey
+                Public-Key: (256 bit)
+                pub: 
+                    04:34:91:48:68:25:c6:e5:fd:49:38:07:ef:46:2d:
+                    82:48:ee:7e:4f:d1:19:27:08:21:8f:f4:50:c7:7e:
+                    68:4e:cb:7c:17:15:9c:19:0b:2f:37:49:e5:ba:70:
+                    94:58:79:42:ab:b6:fc:e1:14:0c:ba:d6:04:1d:1b:
+                    fc:d5:7a:72:e7
+                ASN1 OID: prime256v1
+                NIST CURVE: P-256
+        X509v3 extensions:
+            X509v3 Key Usage: critical
+                Digital Signature
+            X509v3 Extended Key Usage: 
+                Any Extended Key Usage
+            X509v3 Subject Key Identifier: 
+                4D:4E:36:4E:3A:46:48:54:57:3A:49:58:45:47:3A:4F:49:37:51:3A:41:35:57:46:3A:59:44:45:34:3A:37:43:37:4E:3A:47:57:49:51:3A:35:57:32:37:3A:48:4E:35:4A:3A:55:4E:43:41:3A:32:48:4D:42
+            X509v3 Authority Key Identifier: 
+                keyid:51:34:5A:33:3A:47:57:37:49:3A:58:54:50:44:3A:48:4D:34:51:3A:4F:54:54:58:3A:36:41:45:43:3A:52:4D:33:43:3A:41:52:32:43:3A:4F:46:37:37:3A:42:56:45:41:3A:49:46:45:49:3A:43:59:35:4B
+
+    Signature Algorithm: ecdsa-with-SHA256
+         30:46:02:21:00:8d:94:45:92:c0:4d:2d:ed:c6:7d:e2:e7:ae:
+         08:b8:f1:d0:d0:03:0b:a1:7f:6a:e8:1d:a0:83:b3:09:1e:b9:
+         cd:02:21:00:e0:2c:ac:9e:40:f8:c5:c0:67:ea:38:21:99:68:
+         02:ef:70:7b:15:52:b7:ce:a8:3d:e7:17:f7:43:e9:45:4f:29

@@ -124,7 +124,7 @@ func (c *ClientAuthorizer) Interceptor(ctx context.Context, method string, req, 
 		logrus.Error(err)
 		return err
 	}
-	logrus.Info("token")
+	logrus.Info("---> interceptor() : token")
 	logrus.Info(tok)
 
 	md, ok := metadata.FromContext(ctx)

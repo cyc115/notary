@@ -13,4 +13,4 @@ RUN go install \
 EXPOSE 4449
 
 ENTRYPOINT [ "clientapi" ]
-CMD [ "-config", "fixtures/clientapi-server-config.toml" ]
+CMD [ "-config", "fixtures/clientapi-server-prod-config.toml" ]

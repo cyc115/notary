@@ -168,13 +168,15 @@ func (t *Token) Verify(verifyOpts VerifyOptions) error {
 	logrus.Debug("------>> Verify() token: ")
 	// Verify that the Issuer claim is a trusted authority.
 	if !contains(verifyOpts.TrustedIssuers, t.Claims.Issuer) {
-		log.Infof("token from untrusted issuer: %q", t.Claims.Issuer)
+
+		log.Infof("token from untrusted issuer: %q, trusted Issuer is: %q", t.Claims.Issuer, verifyOpts.TrustedIssuers)
+
 		return ErrInvalidToken
 	}
 
 	// Verify that the Audience claim is allowed.
 	if !contains(verifyOpts.AcceptedAudiences, t.Claims.Audience) {
-		log.Infof("token intended for another audience: %q", t.Claims.Audience)
+		log.Infof("token intended for another audience: %v %v", verifyOpts.AcceptedAudiences, t.Claims.Audience)
 		return ErrInvalidToken
 	}
 
@@ -294,7 +296,8 @@ func parseAndVerifyCertChain(x5c []string, roots *x509.CertPool) (leafKey libtru
 	// TODO: this call returns certificate chains which we ignore for now, but
 	// we should check them for revocations if we have the ability later.
 	if _, err = leafCert.Verify(verifyOpts); err != nil {
-		return nil, fmt.Errorf("unable to verify certificate chain: %s", err)
+		return nil, fmt.Errorf("unable to verify certificate chain: %s, leafCertIss: %v, verifyOptsSub: %v", err, leafCert.Issuer.CommonName, string(verifyOpts.Roots.Subjects()[0]))
+		//return nil, fmt.Errorf("unable to verify certificate chain: %s", err)
 	}
 
 	// Get the public key from the leaf certificate.

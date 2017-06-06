@@ -136,13 +136,14 @@ func NewToken(rawToken string) (*Token, error) {
 func (t *Token) Verify(verifyOpts VerifyOptions) error {
 	// Verify that the Issuer claim is a trusted authority.
 	if !contains(verifyOpts.TrustedIssuers, t.Claims.Issuer) {
-		log.Infof("token from untrusted issuer: %q", t.Claims.Issuer)
+		log.Infof("token from untrusted issuer: %q, trusted Issuer is: %q", t.Claims.Issuer, verifyOpts.TrustedIssuers)
+		//log.Infof("token from untrusted issuer: %q", t.Claims.Issuer)
 		return ErrInvalidToken
 	}
 
 	// Verify that the Audience claim is allowed.
 	if !contains(verifyOpts.AcceptedAudiences, t.Claims.Audience) {
-		log.Infof("token intended for another audience: %q", t.Claims.Audience)
+		log.Infof("token intended for %q audience: %q", verifyOpts.AcceptedAudiences, t.Claims.Audience)
 		return ErrInvalidToken
 	}
 
