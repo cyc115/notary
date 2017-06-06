@@ -69,7 +69,8 @@ func GetAddrAndTLSConfig(vc *viper.Viper) (string, *tls.Config, error) {
 	return grpcAddr, tlsConfig, nil
 }
 
-// Note: used by API client probably for token authorization between API client and Server.
+// Note: used by API client probably for token authorization between API client and CLI client
+// however, the auth params from API client is passed to the server for token authentication
 func Authorization(vc *viper.Viper) (grpc.UnaryServerInterceptor, error) {
 	authType := vc.GetString("auth.type")
 	switch authType {

@@ -28,8 +28,8 @@
 		"options" : {
 			"realm" : "https://auth.docker.io/token", 
 			"service" : "notary.docker.io", 
-			"issuer" : "https://idmcoc.imw.motorolasolutions.com:9031",
-			"rootcertbundle" :"./fixtures/motoTokAuth.crt"
+			"issuer" : "auth.docker.io",
+			"rootcertbundle" :"./fixtures/dockerauth.crt"
 		}
 	}
 }

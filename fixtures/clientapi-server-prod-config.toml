@@ -24,6 +24,6 @@ type = "token"
     [auth.options]
     realm = "https://auth.docker.io/token"
     service = "notary.docker.io"
-    issuer = "https://idmcoc.imw.motorolasolutions.com:9031"
+    issuer = "auth.docker.io"
     rootcertbundle = "./dockerauth.crt"
 
