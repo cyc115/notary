@@ -6,16 +6,26 @@ services:
       dockerfile: clientapi.Dockerfile
     ports:
       - "4449:4449"
+    depends_on:
+      - escrow
+    extra_hosts:
+      - "notary-server:127.0.0.1"
     networks:
       api:
       esc:
     entrypoint: clientapi
-    command: -config=./fixtures/clientapi-server-prod-config.toml
+    command: -config=./fixtures/clientapi-server-config.toml 
+  escrow:
+    build:
+      context: .
+      dockerfile: escrow.Dockerfile
+    networks:
+      esc:
+        aliases:
+          - notaryescrow
+    entrypoint: escrow
+    command: -config=./fixtures/escrow-config-local.toml
 networks:
-  mdb:
-    external: false
-  sig:
-    external: false
   api:
     external: false
   esc:

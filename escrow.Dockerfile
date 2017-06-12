@@ -14,4 +14,4 @@ EXPOSE 4450
 RUN go install ${NOTARYPKG}/cmd/escrow
 
 ENTRYPOINT [ "escrow" ]
-CMD [ "-config=fixtures/config.toml" ]
+CMD [ "-config=fixtures/escrow-config-local.toml" ]
