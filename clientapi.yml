@@ -13,8 +13,8 @@ services:
     networks:
       api:
       esc:
-    entrypoint: clientapi
-    command: -config=./fixtures/clientapi-server-config.toml 
+    entrypoint: /usr/bin/env sh
+    command: -c "clientapi -config=./fixtures/clientapi-server-config.toml"
   escrow:
     build:
       context: .
@@ -23,8 +23,8 @@ services:
       esc:
         aliases:
           - notaryescrow
-    entrypoint: escrow
-    command: -config=./fixtures/escrow-config-local.toml
+    entrypoint: /usr/bin/env sh
+    command: -c "escrow -config=./fixtures/escrow-config-local.toml"
 networks:
   api:
     external: false
