@@ -1,6 +1,6 @@
 [storage]
 backend = "file"
-path = "/tmp/keys"
+path = "/.keys"
 
 [server]
 addr = "0.0.0.0:4450"
