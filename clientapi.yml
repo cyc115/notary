@@ -8,10 +8,7 @@ services:
       - "4449:4449"
     depends_on:
       - escrow
-    extra_hosts:
-      - "notary-server:127.0.0.1"
     networks:
-      api:
       esc:
     entrypoint: /usr/bin/env sh
     command: -c "clientapi -config=./fixtures/clientapi-server-config.toml"
@@ -26,7 +23,5 @@ services:
     entrypoint: /usr/bin/env sh
     command: -c "escrow -config=./fixtures/escrow-config-local.toml"
 networks:
-  api:
-    external: false
   esc:
     external: false
