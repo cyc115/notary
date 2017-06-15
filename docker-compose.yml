@@ -20,7 +20,7 @@ services:
       placement:
         constraints: [node.role == notary-server] 
     entrypoint: /usr/bin/env sh
-    command: -c " sleep 5 && notary-server -config=fixtures/server-config.json"
+    command: -c "./migrations/migrate.sh && notary-server -config=fixtures/server-config.json"
     depends_on:
       - mysql
       - signer
@@ -34,7 +34,7 @@ services:
         aliases:
           - notarysigner
     entrypoint: /usr/bin/env sh
-    command: -c "sleep 5 && notary-signer -config=fixtures/signer-config.json"
+    command: -c "./migrations/migrate.sh && notary-signer -config=fixtures/signer-config.json"
     depends_on:
       - mysql
   mysql:
