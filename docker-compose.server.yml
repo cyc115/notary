@@ -1,20 +1,23 @@
 version: "2"
 services:
-  signer:
+  server:
     build:
       context: .
-      dockerfile: signer.Dockerfile
+      dockerfile: server.Dockerfile
     networks:
-      sig:
-        aliases:
-          - notarysigner
+      - mdb
+      - sig
+    ports:
+      - "8080"
+      - "4443:4443"
     entrypoint: /usr/bin/env sh
-    command: -c "./migrations/migrate.sh && notary-signer -config=fixtures/signer-config.json"
+    command: -c "./migrations/migrate.sh && notary-server -config=fixtures/server-config.json"
     depends_on:
       - mysql
+      - signer
   mysql:
     networks:
-      - sig
+      - mdb
     volumes:
       - ./notarysql/mysql-initdb.d:/docker-entrypoint-initdb.d
       - notary_data:/var/lib/mysql
@@ -27,5 +30,7 @@ volumes:
   notary_data:
     external: false
 networks:
+  mdb:
+    external: false
   sig:
     external: false
