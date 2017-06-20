@@ -4,24 +4,25 @@ services:
     build:
       context: .
       dockerfile: server.Dockerfile
-    networks:
-      - mdb
-      - sig
     ports:
-      - "8080"
+      - "8080:8080"
       - "4443:4443"
+    networks:
+      - server
+    extra_hosts:
+      - "notarysigner:172.31.19.180"
+    dns: 8.8.8.8
     entrypoint: /usr/bin/env sh
     command: -c "./migrations/migrate.sh && notary-server -config=fixtures/server-config.json"
     depends_on:
       - mysql
-      - signer
   mysql:
-    networks:
-      - mdb
     volumes:
       - ./notarysql/mysql-initdb.d:/docker-entrypoint-initdb.d
       - notary_data:/var/lib/mysql
     image: mariadb:10.1.10
+    networks:
+      - server
     environment:
       - TERM=dumb
       - MYSQL_ALLOW_EMPTY_PASSWORD="true"
@@ -30,7 +31,7 @@ volumes:
   notary_data:
     external: false
 networks:
-  mdb:
+  server :
     external: false
-  sig:
-    external: false
+
+

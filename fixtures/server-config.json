@@ -1,8 +1,6 @@
 {
 	"server": {
-		"http_addr": ":4443",
-		"tls_key_file": "./notary-server.key",
-		"tls_cert_file": "./notary-server.crt"
+		  "http_addr": ":4443"
 	},
 	"trust_service": {
 		"type": "remote",
