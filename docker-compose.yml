@@ -4,6 +4,8 @@ services:
     build:
       context: .
       dockerfile: signer.Dockerfile
+    ports:
+      - "7899:7899"
     networks:
       sig:
         aliases:
