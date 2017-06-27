@@ -5,12 +5,11 @@ services:
       context: .
       dockerfile: server.Dockerfile
     ports:
-      - "8080:8080"
       - "4443:4443"
     networks:
       - server
     extra_hosts:
-      - "notarysigner:172.31.19.180"
+      - "notarysigner:172.31.3.144"
     dns: 8.8.8.8
     entrypoint: /usr/bin/env sh
     command: -c "./migrations/migrate.sh && notary-server -config=fixtures/server-config.json"
