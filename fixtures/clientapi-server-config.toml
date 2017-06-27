@@ -4,16 +4,17 @@ tls_cert_file = "./clientapi-server.crt"
 tls_key_file = "./clientapi-server.key"
 
 [logging]
-level = "debug"
+level = "info"
 
 [upstream]
-addr = "https://54.202.77.83:4443"
-tls_ca_file = "./root-ca.crt"
+addr = "https://54.174.67.41:4443"
+tls_ca_file = "./clientapi-server.crt"
+addr = "notary-server:4443"
 
 [key_storage]
 type = "remote"
 addr = "notaryescrow:4450"
 tls_ca_file = "./root-ca.crt"
-tls_cert_file = "./clientapi-server.crt"
-tls_key_file = "./clientapi-server.key"
+tls_cert_file = "./clientapi-server.crt.back"
+tls_key_file = "./clientapi-server.key.back"
 secret = "fixturesecret"
