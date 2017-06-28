@@ -1,0 +1,10 @@
+version: "2"
+services:
+  signer:
+    build:
+      context: .
+      dockerfile: signer.Dockerfile
+    ports:
+      - "7899:7899"
+    entrypoint: /usr/bin/env sh
+    command: -c "notary-signer -config=fixtures/signer-config.json"

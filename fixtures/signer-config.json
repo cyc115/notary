@@ -9,7 +9,7 @@
 		"level": "debug"
 	},
 	"storage": {
-		"backend": "mysql",
-		"db_url": "signer@tcp(mysql:3306)/notarysigner?parseTime=True"
+		"backend": "postgres",
+		"db_url": "postgres://XXXX:XXXX@XXXX:5432/notarysigner"
 	}
 }
