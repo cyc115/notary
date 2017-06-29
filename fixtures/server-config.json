@@ -17,7 +17,7 @@
 		"level": "info"
 	},
 	"storage": {
-		"backend": "mysql",
-		"db_url": "server@tcp(mysql:3306)/notaryserver?parseTime=True"
+		"backend": "postgres",
+		"db_url": "postgres://xx:xx@xxx/notaryserver"
 	}
 }
