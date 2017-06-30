@@ -3,13 +3,13 @@
 		"grpc_addr": ":7899",
 		"tls_cert_file": "./notary-signer.crt",
 		"tls_key_file": "./notary-signer.key",
-		"client_ca_file": "./notary-server.crt"
+		"client_ca_file": "./root-ca.crt"
 	},
 	"logging": {
 		"level": "debug"
 	},
 	"storage": {
 		"backend": "postgres",
-		"db_url": "postgres://XXXX:XXXX@XXXX:5432/notarysigner"
+		"db_url": ""
 	}
 }
