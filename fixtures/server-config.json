@@ -1,8 +1,8 @@
 {
 	"server": {
 		  "http_addr": ":4443",
-      "tls_key_file" : "./cyc/key.pem",
-      "tls_cert_file" : "./cyc/certificate.pem"
+      "tls_key_file" : "./key.pem",
+      "tls_cert_file" : "./certificate.pem"
 	},
 	"trust_service": {
 		"type": "remote",
@@ -18,6 +18,6 @@
 	},
 	"storage": {
 		"backend": "postgres",
-		"db_url": "postgres://xx:xx@xxx/notaryserver"
+		"db_url": ""
 	}
 }
